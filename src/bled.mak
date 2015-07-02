@@ -1,12 +1,5 @@
 #
-# nmake 用 Makefile
-# BGAPIのサンプルコーディング
-#
-# ●実行例
 # nmake -f bled.mak
-#
-# ●必要なDLL
-# なし
 
 MT=mt
 CP=copy
@@ -35,8 +28,10 @@ cmd_def.obj:	cmd_def.h
 
 stubs.obj:	cmd_def.h
 
+config_data.obj:	config_data.h
+
 main.obj:	cmd_def.h uart.h
 
-beacon.exe:	main.obj stubs.obj cmd_def.obj uart.obj
-	$(CC) /Fe$@ main.obj stubs.obj cmd_def.obj uart.obj $(LINKFLAG) /link $(LIBS)
+beacon.exe:	main.obj stubs.obj cmd_def.obj uart.obj config_data.obj
+	$(CC) /Fe$@ main.obj stubs.obj cmd_def.obj uart.obj config_data.obj $(LINKFLAG) /link $(LIBS)
 	IF EXIST $@.manifest $(MT) -manifest $@.manifest -outputresource:$@

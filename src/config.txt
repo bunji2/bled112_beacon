@@ -5,41 +5,42 @@
 
 # uuid (Hexadecimal, 32byte)
 #   beacon uuid
-uuid=e2c56db5dffb48d2b060d0f5a71096e0
+#   Example: uuid=e2c56db5dffb48d2b060d0f5a71096e0
+uuid=FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 
-# major (Decimal)
+# major
 #   Major number
 #   Range: 0-255
-major=0
+major=0xFF
 
-# minor (Decimal)
+# minor
 #   Minor number
 #   Range: 0-255
-minor=0
+minor=254
 
-# txpower (Decimal)
+# txpower
 #   Tx power
 #   Range: -127 - 127
 txpower=-58
 
-# adv_interval_min (decimal)
+# adv_interval_min
 #   Minimum advertisement interval in units of 625us
 #   Range: 0x20 to 0x4000
 #   Default: 0x200 (320ms)
 #   Example: 0x200 = 512. 512 * 625us = 320000us = 320ms
 adv_interval_min=160
 
-# adv_interval_max (decimal)
+# adv_interval_max
 #   Maximum advertisement interval in units of 625us
 #   Range: 0x20 to 0x4000
 #   Default: 0x200 (320ms)
 #   Example: 0x200 = 512. 512 * 625us = 320000us = 320ms
-adv_interval_max=160
+adv_interval_max=0xA0
 
-# adv_channels (decimal)
+# adv_channels
 #   A bit mask to identify which of the three advertisement channels are used
 #   Excamle:
 #     7: all three channels are used,
 #     3: advertisement channels 37 and 38 are used,
 #     4: only advertisement channel 39 is used
-adv_channels=7
+adv_channels=0x07

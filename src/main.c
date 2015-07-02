@@ -1,4 +1,4 @@
-// BGAPI を用いて BLE デバイスの属性を検索するコード
+// BGAPI を用いて iBeacon 風のアドバタイジングするサンプルコード
 // by bunji2
 
 #include <string.h>
@@ -10,24 +10,14 @@
 #include "cmd_def.h"
 #include "uart.h"
 
-//#define DEBUG
+#include "config_data.h"
+
 
 #define CLARG_PORT 1
 #define CLARG_ACTION 2
 
 #define UART_TIMEOUT 1000
 
-#define FIRST_HANDLE 0x0001
-#define LAST_HANDLE  0xffff
-
-uint16 first_handle = FIRST_HANDLE;
-uint16 last_handle = LAST_HANDLE;
-
-#define MAX_DEVICES 64
-int found_devices_count = 0;
-bd_addr found_devices[MAX_DEVICES];
-
-char str_buf[80] = {0x0};
 enum actions {
   action_none,
   action_beacon,
@@ -43,10 +33,11 @@ typedef enum {
 } states;
 
 states state = state_disconnected;
+config_data_t cf;
 
 void usage(char *exe)
 {
-  printf("%s <list|COMx <info|beacon>>\n", exe);
+  printf("%s <list|COMx <info|config_filename>>\n", exe);
 }
 
 void change_state(states new_state)
@@ -142,20 +133,6 @@ int read_message(int timeout_ms)
   return 0;
 }
 
-// [2] デバイスの情報表示の取得
-void ble_rsp_system_get_info(
-  const struct ble_msg_system_get_info_rsp_t *msg
-){
-  printf("#ble_rsp_system_get_info\n");
-  printf("major=%u, minor=%u, ", msg->major, msg->minor);
-  printf("patch=%u, ", msg->patch);
-  printf("build=%u, ", msg->build);
-  printf("ll_version=%u, ", msg->ll_version);
-  printf("protocol_version=%u, ", msg->protocol_version);
-  printf("hw=%u\n", msg->hw);
-  if (action == action_info) change_state(state_finish);
-}
-
 void print_str_uint8array(uint8array data) {
   int i;
   for (i=0; i<data.len; i++) {
@@ -207,12 +184,24 @@ void do_beacon() {
     // TX power : -58
     0xc6
   };
-
+  int i;
+  
+  for (i=0; i<16; i++) {
+    advdata[9+i] = cf.uuid[i];
+  }
+  advdata[25] = cf.major>>8;
+  advdata[26] = cf.major&0xFF;
+  advdata[27] = cf.minor>>8;
+  advdata[28] = cf.minor&0xFF;
+  advdata[29] = cf.txpower;
+  
   // Set advertisement parameters
   //   adv_interval_min: 160 (100ms)
   //   adv_interval_max: 160 (100ms)
   //   adv_channels: 7 (all three channels are used)
-  ble_cmd_gap_set_adv_parameters(160, 160, 7);
+  // ble_cmd_gap_set_adv_parameters(160, 160, 7);
+  ble_cmd_gap_set_adv_parameters(
+    cf.adv_interval_min, cf.adv_interval_min, cf.adv_channels);
 
   // Set advertisement data
   //   set_scanrsp: 0 (sets advertisement data)
@@ -229,6 +218,11 @@ void do_beacon() {
 
 
 // ここから、このコードでは使用していない関数
+void ble_rsp_system_get_info(
+  const struct ble_msg_system_get_info_rsp_t *msg
+){
+}
+
 void ble_evt_gap_scan_response(
   const struct ble_msg_gap_scan_response_evt_t *msg
 ){
@@ -313,7 +307,10 @@ int main(int argc, char *argv[]) {
     if (strcmp(argv[CLARG_ACTION], "info") == 0) {
       action = action_info;    // デバイス情報の表示
     } else {
-      action = action_beacon; // Beacon
+      if (config_data_load(argv[CLARG_ACTION]) != 0) {
+        config_data_print();
+        action = action_beacon; // Beacon
+      }
     }
   }
   if (action == action_none) {
