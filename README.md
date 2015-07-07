@@ -6,7 +6,7 @@
 
 ```
 C:\work>beacon
-beacon <list|COMx <info|config_filename>>
+beacon <list|COMx <info|stop|start config_filename>>
 ```
 ### bled112 のシリアルポートの表示
 
@@ -20,7 +20,7 @@ Bluegiga Bluetooth Low Energy (COM4)
 引数の config.txt は設定ファイルのパス。
 
 ```
-C:\work>beacon COM4 config.txt
+C:\work>beacon COM4 start config.txt
 uuid=ffffffffffffffffffffffffffffffff
 major=0x00ff
 minor=0x00fe
@@ -28,7 +28,12 @@ txpower=-58
 adv_interval_min=160
 adv_interval_max=160
 adv_channels=0x07
+```
 
+### ビーコンのアドバタイジング終了
+
+```
+C:\work>beacon COM4 stop
 ```
 
 ### 設定ファイルの記述例
