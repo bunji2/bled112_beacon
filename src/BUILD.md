@@ -1,14 +1,14 @@
-#�r���h�菇
+#ビルド手順
 
-##���F
-* Windows 7 �܂��� Windows 8
+##環境：
+* Windows 7 または Windows 8
 * Visual Studio 2010 Express
 
-##�菇�F
+##手順：
 
-* Visual Studio �R�}���h�v�����v�g���N���B
-* ���̃\�[�X�R�[�h�̂���f�B���N�g���ֈړ��B
-* �ȉ��̃R�}���h����́B
+* Visual Studio コマンドプロンプトを起動。
+* このソースコードのあるディレクトリへ移動。
+* 以下のコマンドを入力。
 
 ```
   nmake -f bled.mak
