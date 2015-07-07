@@ -226,16 +226,29 @@ void ble_rsp_system_get_info(
   const struct ble_msg_system_get_info_rsp_t *msg
 ){
 //  printf("#ble_rsp_system_get_info\n");
-  printf("major=%u, minor=%u, ", msg->major, msg->minor);
-  printf("patch=%u, ", msg->patch);
-  printf("build=%u, ", msg->build);
-  printf("ll_version=%u, ", msg->ll_version);
-  printf("protocol_version=%u, ", msg->protocol_version);
-  printf("hw=%u\n", msg->hw);
   if (action == action_info) {
+    printf("major=%u, minor=%u, ", msg->major, msg->minor);
+    printf("patch=%u, ", msg->patch);
+    printf("build=%u, ", msg->build);
+    printf("ll_version=%u, ", msg->ll_version);
+    printf("protocol_version=%u, ", msg->protocol_version);
+    printf("hw=%u\n", msg->hw);
+  
+    ble_cmd_system_address_get();
+  }
+}
+
+void ble_rsp_system_address_get(
+  const struct ble_msg_system_address_get_rsp_t * msg
+) {
+  if (action == action_info) {
+    printf ("address=");
+    print_bdaddr(msg->address);
+    printf ("\n");
     change_state(state_finish);
   }
 }
+
 int main(int argc, char *argv[]) {
   char *uart_port = "";
 
@@ -268,7 +281,8 @@ int main(int argc, char *argv[]) {
       action = action_info;    // デバイス情報の表示
     } else if (strcmp(argv[CLARG_ACTION], "stop") == 0) {
       action = action_stop;    // BLEDのリセット
-    } else if (strcmp(argv[CLARG_ACTION], "start") == 0 && argc > CLARG_ACTION) {
+    } else if (strcmp(argv[CLARG_ACTION], "start") == 0 && argc > CLARG_ACTION+1) {
+      //printf("argc=%d, CLARG_ACTION=%d\n", argc, CLARG_ACTION);
       if (config_data_load(argv[CLARG_ACTION+1]) != 0) {
         config_data_print();
         action = action_start; // Start Beacon

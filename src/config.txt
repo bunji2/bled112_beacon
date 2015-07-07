@@ -6,7 +6,7 @@
 # uuid (Hexadecimal, 32byte)
 #   beacon uuid
 #   Example: uuid=e2c56db5dffb48d2b060d0f5a71096e0
-uuid=FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+uuid=FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0
 
 # major
 #   Major number
