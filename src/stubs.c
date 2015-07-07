@@ -281,11 +281,11 @@ void ble_rsp_sm_whitelist_bonds(const struct ble_msg_sm_whitelist_bonds_rsp_t *m
 void ble_rsp_gap_set_privacy_flags(const void* nul)
 {
 }
-
+/*
 void ble_rsp_gap_set_mode(const struct ble_msg_gap_set_mode_rsp_t *msg)
 {
 }
-
+*/
 void ble_rsp_gap_discover(const struct ble_msg_gap_discover_rsp_t *msg)
 {
 }
@@ -526,6 +526,41 @@ void ble_evt_hardware_analog_comparator_status(const struct ble_msg_hardware_ana
 {
 }
 
+void ble_evt_gap_scan_response(
+  const struct ble_msg_gap_scan_response_evt_t *msg
+){
+}
+
+void ble_evt_connection_status(
+  const struct ble_msg_connection_status_evt_t *msg
+){
+}
+
+void ble_evt_attclient_attribute_value(
+  const struct ble_msg_attclient_attribute_value_evt_t *msg
+){
+
+}
+
+void ble_evt_attclient_procedure_completed(
+  const struct ble_msg_attclient_procedure_completed_evt_t *msg
+){
+}
+
+void ble_evt_attclient_group_found(
+  const struct ble_msg_attclient_group_found_evt_t *msg
+){
+}
+
+void ble_evt_attclient_find_information_found(
+  const struct ble_msg_attclient_find_information_found_evt_t *msg
+){
+}
+
+void ble_evt_connection_disconnected(
+  const struct ble_msg_connection_disconnected_evt_t *msg
+) {
+}
 
 /**Reset system**/
 void ble_rsp_dfu_reset(const void *nul)

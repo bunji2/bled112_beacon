@@ -20,7 +20,8 @@
 
 enum actions {
   action_none,
-  action_beacon,
+  action_start,
+  action_stop,
   action_info,
 };
 enum actions action = action_none;
@@ -37,7 +38,7 @@ config_data_t cf;
 
 void usage(char *exe)
 {
-  printf("%s <list|COMx <info|config_filename>>\n", exe);
+  printf("%s <list|COMx <info|stop|start config_filename>>\n", exe);
 }
 
 void change_state(states new_state)
@@ -216,66 +217,25 @@ void do_beacon() {
 
 }
 
+void ble_rsp_gap_set_mode(const struct ble_msg_gap_set_mode_rsp_t *msg)
+{
+  change_state(state_finish);
+}
 
-// ここから、このコードでは使用していない関数
 void ble_rsp_system_get_info(
   const struct ble_msg_system_get_info_rsp_t *msg
 ){
+//  printf("#ble_rsp_system_get_info\n");
+  printf("major=%u, minor=%u, ", msg->major, msg->minor);
+  printf("patch=%u, ", msg->patch);
+  printf("build=%u, ", msg->build);
+  printf("ll_version=%u, ", msg->ll_version);
+  printf("protocol_version=%u, ", msg->protocol_version);
+  printf("hw=%u\n", msg->hw);
+  if (action == action_info) {
+    change_state(state_finish);
+  }
 }
-
-void ble_evt_gap_scan_response(
-  const struct ble_msg_gap_scan_response_evt_t *msg
-){
-}
-
-void ble_evt_connection_status(
-  const struct ble_msg_connection_status_evt_t *msg
-){
-}
-
-void ble_evt_attclient_attribute_value(
-  const struct ble_msg_attclient_attribute_value_evt_t *msg
-){
-
-}
-
-void ble_evt_attclient_procedure_completed(
-  const struct ble_msg_attclient_procedure_completed_evt_t *msg
-){
-}
-
-void ble_evt_attclient_group_found(
-  const struct ble_msg_attclient_group_found_evt_t *msg
-){
-/*
-  uint16 uuid;
-  
-  printf("#ble_evt_attclient_group_found [%s]\n", state_names[state]);
-
-  if (msg->uuid.len == 0) return;
-  uuid = (msg->uuid.data[1] << 8) | msg->uuid.data[0];
-
-  printf("service=0x%04x, handles=%d-%d\n", uuid, msg->start, msg->end);
-*/
-}
-
-void ble_evt_attclient_find_information_found(
-  const struct ble_msg_attclient_find_information_found_evt_t *msg
-){
-/*
-  printf("#ble_evt_attclient_find_information_found [%s]\n",
-    state_names[state]);
-*/
-}
-
-void ble_evt_connection_disconnected(
-  const struct ble_msg_connection_disconnected_evt_t *msg
-) {
-}
-
-// ここまで、このコードでは使用していない関数
-
-
 int main(int argc, char *argv[]) {
   char *uart_port = "";
 
@@ -306,10 +266,12 @@ int main(int argc, char *argv[]) {
 
     if (strcmp(argv[CLARG_ACTION], "info") == 0) {
       action = action_info;    // デバイス情報の表示
-    } else {
-      if (config_data_load(argv[CLARG_ACTION]) != 0) {
+    } else if (strcmp(argv[CLARG_ACTION], "stop") == 0) {
+      action = action_stop;    // BLEDのリセット
+    } else if (strcmp(argv[CLARG_ACTION], "start") == 0 && argc > CLARG_ACTION) {
+      if (config_data_load(argv[CLARG_ACTION+1]) != 0) {
         config_data_print();
-        action = action_beacon; // Beacon
+        action = action_start; // Start Beacon
       }
     }
   }
@@ -340,16 +302,18 @@ int main(int argc, char *argv[]) {
     // [2] デバイスの情報表示の要求
     ble_cmd_system_get_info();
 
-  } else if (action == action_beacon) {
+  } else if (action == action_start) {
 
     change_state(state_adverting);
     // [3] Beacon
     do_beacon();
   }
 
-  // メッセージループ
-  while (state != state_finish) {
-    if (read_message(UART_TIMEOUT) > 0) break;
+  if (action != action_stop) {
+    // メッセージループ
+    while (state != state_finish) {
+      if (read_message(UART_TIMEOUT) > 0) break;
+    }
   }
 
   // COMポートのクローズ
