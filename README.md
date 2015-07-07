@@ -17,6 +17,8 @@ Bluegiga Bluetooth Low Energy (COM4)
 
 ### ビーコンのアドバタイジング開始
 
+引数の config.txt は設定ファイルのパス。
+
 ```
 C:\work>beacon COM4 config.txt
 uuid=ffffffffffffffffffffffffffffffff
@@ -79,3 +81,6 @@ adv_interval_max=0xA0
 #     4: only advertisement channel 39 is used
 adv_channels=0x07
 ```
+
+* 先頭の一文字目が "#" の行はコメント行。
+* 名前=値のは設定を行う行だが、余分な空白やタブは許容されない。
